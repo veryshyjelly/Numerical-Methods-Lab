@@ -1,3 +1,31 @@
+function GaussElimination(A::Matrix{Float64}, b::Vector{Float64}, n::Int64)::Vector{Float64}
+    for i in 1:n-1
+        for j in i+1:n
+            if A[i,i] == 0
+                continue 
+            end
+            m = A[j,i]/A[i,i]
+            A[j,:] -= m * A[i,:]
+            b[j] -= m * b[i]
+        end
+    end
+
+    x = zeros(n)
+    for i in n:-1:1
+        x[i] = (b[i] - dot(A[i,i+1:n], x[i+1:n])) / A[i,i]
+    end
+
+    return vec(x)
+end
+
+function dot(A::Vector{Float64}, B::Vector{Float64})::Float64
+    sum = 0.0
+    for i in 1:length(A)
+        sum += A[i] * B[i]
+    end
+    return sum
+end
+
 function CubicSplineInterploation(x::Vector{Float64}, y::Vector{Float64}, n::Int64)::Vector{Float64}
     # Define the matrix A
     A = zeros(4*n-4, 4*n-4)
@@ -55,8 +83,10 @@ function CubicSplineInterploation(x::Vector{Float64}, y::Vector{Float64}, n::Int
 
     # Solve the system of linear equations
     show(stdout, "text/plain", A)
-    show(stdout, "text/plain", B)
-    C = A\B
+    # show(stdout, "text/plain", B)
+    # C = GaussElimination(A, B, 4*n-4)
+    C = A^(-1) * B
+    show(stdout, "text/plain", C)
 
     # Return the coefficients
     return C
